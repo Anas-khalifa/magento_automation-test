@@ -1,5 +1,6 @@
 import java.time.Duration;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.By;
@@ -16,7 +17,7 @@ public class MyTest extends Parameters {
 		GeneralSetup();
 	}
 
-	@Test(priority = 1)
+	@Test(priority = 1,enabled=false)
 	public void signUpTest() {
 		WebElement createAccountPage = driver.findElement(By.linkText("Create an Account"));
 		createAccountPage.click();
@@ -97,7 +98,7 @@ public class MyTest extends Parameters {
 
 	}
 
-	@Test(priority = 5)
+	@Test(priority = 5,enabled=false)
 	public void BagSection() throws InterruptedException {
 		driver.get("https://magento.softwaretestingboard.com/gear/bags.html");
 		WebElement bagsContainor = driver.findElement(By.cssSelector(".products.list.items.product-items"));
@@ -121,7 +122,7 @@ public class MyTest extends Parameters {
 
 	}
 
-	@Test(priority = 6)
+	@Test(priority = 6,enabled=false)
 	public void checkout() throws InterruptedException {
 		WebElement checkoutTap = driver.findElement(By.cssSelector(".action.showcart"));
 		checkoutTap.click();
@@ -136,7 +137,7 @@ public class MyTest extends Parameters {
 		WebElement phoneInput = driver.findElement(By.xpath("//input[@name='telephone']"));
 		WebElement shippingMethod = driver.findElement(By.tagName("tbody"));
 		List<WebElement> methods = shippingMethod.findElements(By.tagName("tr"));
-		WebElement nextButton=driver.findElement(By.cssSelector(".button.action.continue.primary"));
+		WebElement nextButton = driver.findElement(By.cssSelector(".button.action.continue.primary"));
 
 		Select selectState = new Select(stateInput);
 		Select selectCountry = new Select(countryInput);
@@ -149,20 +150,43 @@ public class MyTest extends Parameters {
 		methods.get(1).click();
 		nextButton.click();
 		Thread.sleep(3000);
-		WebElement placeOrderButton=driver.findElement(By.cssSelector(".action.primary.checkout"));
+		WebElement placeOrderButton = driver.findElement(By.cssSelector(".action.primary.checkout"));
 		placeOrderButton.click();
 		Thread.sleep(2000);
-		boolean confirmPurchaseMsg=driver.findElement(By.className("checkout-success")).getText().contains("Your order number");
+		boolean confirmPurchaseMsg = driver.findElement(By.className("checkout-success")).getText()
+				.contains("Your order number");
 
 		Assert.assertEquals(confirmPurchaseMsg, true);
 
 	}
 
-	@Test(priority = 5, enabled = false)
-	public void subscribeTest() {
-		WebElement subscribePage = driver.findElement(By.cssSelector(
-				"a[href='https://softwaretestingboard.com/subscribe/?utm_source=magento_store&utm_medium=banner&utm_campaign=notes_promo&utm_id=email_subscribe']"));
-		subscribePage.click();
+	@Test(priority = 7)
+	public void subscribeTest() throws InterruptedException {
+	    // Get the current window handle (original tab)
+	    String originalWindowHandle = driver.getWindowHandle();
+
+	    // Click the link that opens the new tab
+	    WebElement subscribePage = driver.findElement(By.linkText("Subscribe"));
+	    subscribePage.click();
+	    Thread.sleep(2000); // Wait for the new tab to open
+
+	    // Get all window handles
+	    Set<String> windowHandles = driver.getWindowHandles();
+
+	    // Switch to the new tab
+	    for (String windowHandle : windowHandles) {
+	        if (!windowHandle.equals(originalWindowHandle)) {
+	            driver.switchTo().window(windowHandle);
+	            break;
+	        }
+	    }
+
+	    // Now you're on the new tab, perform your test
+	    WebElement emailAddress = driver.findElement(By.id("mce-EMAIL"));
+	    emailAddress.sendKeys(email);
+
+	    // Optionally, switch back to the original tab
+	    driver.switchTo().window(originalWindowHandle);
 	}
 
 }

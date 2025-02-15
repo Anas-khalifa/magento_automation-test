@@ -6,7 +6,7 @@
       <class name="MyTest">
         <methods>
           <include name="setup"/>
-          <include name="BagSection"/>
+          <include name="subscribeTest"/>
         </methods>
       </class> <!-- MyTest -->
     </classes>
