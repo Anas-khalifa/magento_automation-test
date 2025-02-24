@@ -17,7 +17,7 @@ public class MyTest extends Parameters {
 		GeneralSetup();
 	}
 
-	@Test(priority = 1,enabled=false)
+	@Test(priority = 1, enabled = false)
 	public void signUpTest() {
 		WebElement createAccountPage = driver.findElement(By.linkText("Create an Account"));
 		createAccountPage.click();
@@ -98,7 +98,7 @@ public class MyTest extends Parameters {
 
 	}
 
-	@Test(priority = 5,enabled=false)
+	@Test(priority = 5, enabled = false)
 	public void BagSection() throws InterruptedException {
 		driver.get("https://magento.softwaretestingboard.com/gear/bags.html");
 		WebElement bagsContainor = driver.findElement(By.cssSelector(".products.list.items.product-items"));
@@ -122,7 +122,7 @@ public class MyTest extends Parameters {
 
 	}
 
-	@Test(priority = 6,enabled=false)
+	@Test(priority = 6, enabled = false)
 	public void checkout() throws InterruptedException {
 		WebElement checkoutTap = driver.findElement(By.cssSelector(".action.showcart"));
 		checkoutTap.click();
@@ -160,33 +160,69 @@ public class MyTest extends Parameters {
 
 	}
 
-	@Test(priority = 7)
-	public void subscribeTest() throws InterruptedException {
-	    // Get the current window handle (original tab)
-	    String originalWindowHandle = driver.getWindowHandle();
+	@Test(priority = 7, enabled = false)
+	public void subscribeTest() {
+		String originalWindowHandle = driver.getWindowHandle();
 
-	    // Click the link that opens the new tab
-	    WebElement subscribePage = driver.findElement(By.linkText("Subscribe"));
-	    subscribePage.click();
-	    Thread.sleep(2000); // Wait for the new tab to open
+		WebElement subscribePage = driver.findElement(By.linkText("Subscribe"));
+		subscribePage.click();
 
-	    // Get all window handles
-	    Set<String> windowHandles = driver.getWindowHandles();
+		Set<String> windowHandles = driver.getWindowHandles();
 
-	    // Switch to the new tab
-	    for (String windowHandle : windowHandles) {
-	        if (!windowHandle.equals(originalWindowHandle)) {
-	            driver.switchTo().window(windowHandle);
-	            break;
-	        }
-	    }
+		windowHandles.remove(originalWindowHandle);
+		String newWindowHandle = windowHandles.iterator().next();
 
-	    // Now you're on the new tab, perform your test
-	    WebElement emailAddress = driver.findElement(By.id("mce-EMAIL"));
-	    emailAddress.sendKeys(email);
+		driver.switchTo().window(newWindowHandle);
 
-	    // Optionally, switch back to the original tab
-	    driver.switchTo().window(originalWindowHandle);
+		WebElement emailAddress = driver.findElement(By.id("mce-EMAIL"));
+		emailAddress.sendKeys(email);
+
+		WebElement subscribeBtn = driver.findElement(By.id("mc-embedded-subscribe"));
+		subscribeBtn.click();
+
+		driver.switchTo().window(originalWindowHandle);
+	}
+
+	@Test(priority = 8)
+	public void gearSection() {
+		driver.get("https://magento.softwaretestingboard.com/gear/fitness-equipment.html");
+		int randomItems = rand.nextInt(3);
+
+		WebElement productItems = driver.findElement(By.cssSelector(".products.list.items.product-items"));
+		List<WebElement> productList = productItems.findElements(By.tagName("li"));
+
+		for (int i = 0; i < 3; i++) {
+			productItems = driver.findElement(By.cssSelector(".products.list.items.product-items"));
+			productList = productItems.findElements(By.tagName("li"));
+			productList.get(i).click();
+			try {
+				WebElement addToCartButton = driver.findElement(By.id("product-addtocart-button"));
+				if (addToCartButton.isDisplayed()) {
+					List<WebElement> quantity = driver.findElements(By.xpath("//input[@title='Qty']"));
+					quantity.get(0).clear();
+					quantity.get(0).sendKeys("1");
+					addToCartButton.click();
+					Thread.sleep(1000);
+					driver.navigate().back();
+					continue;
+				}
+				WebElement customAddToCartButton = driver.findElement(By.cssSelector("#bundle-slide"));
+				if (customAddToCartButton.isDisplayed()) {
+					customAddToCartButton.click();
+					Thread.sleep(1000);
+					WebElement addButton = driver.findElement(By.id("product-addtocart-button"));
+					addButton.click();
+					Thread.sleep(1000);
+					driver.navigate().back();
+					continue;
+				}
+
+			} catch (Exception e) {
+
+			}
+
+		}
+
 	}
 
 }
