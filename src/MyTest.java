@@ -222,7 +222,20 @@ public class MyTest extends Parameters {
 			}
 
 		}
+		
 
+		WebElement sortBtn=driver.findElement(By.id("sorter"));
+		Select sortSelect=new Select(sortBtn);
+		sortSelect.selectByValue("price");
+	
+		WebElement productContainor=driver.findElement(By.cssSelector(".products.list.items.product-items"));
+		List<WebElement> allProducts=productContainor.findElements(By.tagName("li"));
+		WebElement firstProduct=allProducts.get(0);
+		double firstPrice=Double.parseDouble(firstProduct.findElement(By.className("price")).getText().substring(1));
+		WebElement lastProduct=allProducts.get(allProducts.size()-1);
+		double lastPrice=Double.parseDouble(lastProduct.findElement(By.className("price")).getText().substring(1));
+
+		Assert.assertTrue(firstPrice<=lastPrice);
 	}
 
 }
